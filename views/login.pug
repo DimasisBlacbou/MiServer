@@ -1,0 +1,17 @@
+doctype html
+html(lang="en")
+  head
+    title page1
+
+  body
+    if error != undefined 
+      p Неправельный пароль или почта
+
+    form(method="post" action="/login")
+
+      input(type="email" name="mail" placeholder="What you email" )
+      input(type="password" name="password" placeholder="What you password")
+      input(type="submit" value="Confirm" )
+
+
+
