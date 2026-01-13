@@ -1,4 +1,8 @@
-const { registerAccount, loginAccount } = require("./data.js");
+const {
+  registerAccount,
+  loginAccount,
+  checkdDuplicateAccount,
+} = require("./data.js");
 
 const jwt = require("jsonwebtoken");
 
@@ -13,7 +17,13 @@ const userRouter = (app) => {
       mail,
       year,
       password,
+      cart: [],
     };
+    const rezult = await checkdDuplicateAccount(mail);
+    if (rezult == true) {
+      res.redirect("/register?error=1");
+      return;
+    }
     await registerAccount(user);
     /*     res.status(200).json("ok"); */
     const token = jwt.sign({ mail: mail }, process.env.JWTSECRET);

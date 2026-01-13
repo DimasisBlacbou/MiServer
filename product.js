@@ -1,5 +1,6 @@
 const fs = require("fs");
 const {
+  addCart,
   removeProduct,
   addProduct,
   editProduct,
@@ -152,6 +153,14 @@ const productRouter = (app) => {
     }
     const id = req.query.id;
     const _ = await removeProduct(id);
+    res.status(200).json({ result: "ok" });
+  });
+  app.post("/cart", async (req, res) => {
+    const token = req.cookies.token;
+    const decoded = jwt.verify(token, process.env.JWTSECRET);
+    const mail = decoded.mail;
+    const id = req.query.id;
+    await addCart(mail, id);
     res.status(200).json({ result: "ok" });
   });
 };

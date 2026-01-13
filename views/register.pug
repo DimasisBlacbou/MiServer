@@ -4,6 +4,8 @@ html(lang="en")
     title page1
 
   body
+    if error != undefined 
+      p Аккаунт уже зарегестрирован на эту почту
 
     form(method="post" action="/register")
 
@@ -12,7 +14,3 @@ html(lang="en")
       input(type="password" name="password" placeholder="What you password")
       input(type="text" name="year" placeholder="What you year" )
       input(type="submit" value="Confirm" )
-
-
-
-

@@ -50,7 +50,25 @@ async function loginAccount(user) {
     return true;
   } else return false;
 }
+async function checkdDuplicateAccount(mail) {
+  const userResult = await accountsCollection.find({ mail }).toArray();
+  if (userResult.length == 1) {
+    return true;
+  } else return false;
+}
+async function addCart(mail, id) {
+  const result = await accountCollection.updateOne(
+    { mail },
+    {
+      $push: {
+        cart: id,
+      },
+    }
+  );
+}
 module.exports = {
+  addCart,
+  checkdDuplicateAccount,
   loginAccount,
   removeProduct,
   editProduct,

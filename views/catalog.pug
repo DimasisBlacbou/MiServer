@@ -1,2 +1,14 @@
-P Добро пожаловать! #{account.name}
+script(src="catalog.js")
 
+P Добро пожаловать! #{account.name}
+ul
+    each product in products
+        li
+            p=product.id
+            h1=product.name
+            p=product.price
+            p=product.inStock
+            p=product.description 
+            h2=product.weight
+            h2=product.flavor
+            button Добавить в карзину
