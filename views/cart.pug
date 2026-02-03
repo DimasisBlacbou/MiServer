@@ -1,0 +1,11 @@
+    include includes/head.pug
+p Kорзина
+    each product in localCart
+        li
+            p=product.id
+            h1=product.name
+            p=product.price
+            p=product.inStock
+            p=product.description 
+            h2=product.weight
+            h2=product.flavor

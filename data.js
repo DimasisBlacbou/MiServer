@@ -57,7 +57,7 @@ async function checkdDuplicateAccount(mail) {
   } else return false;
 }
 async function addCart(mail, id) {
-  const result = await accountCollection.updateOne(
+  const result = await accountsCollection.updateOne(
     { mail },
     {
       $push: {
