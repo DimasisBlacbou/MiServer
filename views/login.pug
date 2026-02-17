@@ -1,17 +1,14 @@
-doctype html
-html(lang="en")
-  head
-    title page1
+include includes/head.pug
+include includes/navbar.pug
 
-  body
-    if error != undefined 
-      p Неправельный пароль или почта
-
-    form(method="post" action="/login")
-
-      input(type="email" name="mail" placeholder="What you email" )
-      input(type="password" name="password" placeholder="What you password")
-      input(type="submit" value="Confirm" )
+main.container.py-8
+  if error
+    p.text-red-400.mb-4 Неправильный пароль или почта
+  form(method="post" action="/login" class="max-w-md mx-auto bg-card p-6 rounded-lg shadow-md")
+    h2(class="text-2xl font-semibold mb-4 text-white") Вход
+    input(type="email" name="mail" placeholder="Email" class="w-full mb-3 p-3 rounded border bg-transparent text-white border-gray-600")
+    input(type="password" name="password" placeholder="Пароль" class="w-full mb-4 p-3 rounded border bg-transparent text-white border-gray-600")
+    input(type="submit" value="Войти" class="w-full bg-accent text-black py-2 rounded")
 
 
 

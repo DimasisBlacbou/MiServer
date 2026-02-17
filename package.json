@@ -3,20 +3,33 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node index.js"
+    "build:css": "postcss public/tailwind.css -o public/add.css",
+    "watch:css": "postcss public/tailwind.css -o public/add.css -w",
+    "watch:tailwind": "onchange \"public/tailwind.css\" \"tailwind.config.js\" \"views/**/*\" -- npm run build:css",
+    "start": "node index.js",
+    "dev": "concurrently \"npm run watch:css\" \"npm run watch:tailwind\" \"nodemon index.js\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "autoprefixer": "^10.4.24",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "mongodb": "^6.20.0",
     "multer": "^2.0.2",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.1",
     "pug": "^3.0.3",
+    "tailwindcss": "^4.1.18",
     "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.11",
+    "onchange": "^7.1.0"
   }
 }

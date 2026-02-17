@@ -15,9 +15,10 @@ app.use(express.static("public"));
 app.set("view engine", "pug");
 app.set("views", "./views");
 app.use(cookieParser());
+
 otherRouter(app);
 userRouter(app);
 productRouter(app);
 clientRouter(app);
 
-app.listen(3000);
+app.listen(process.env.PORT || 3000);

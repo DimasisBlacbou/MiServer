@@ -1,5 +1,5 @@
 const { MongoClient } = require("mongodb");
-const url = "mongodb://localhost:27017";
+const url = "mongodb://127.0.0.1:27017";
 const client = new MongoClient(url);
 const dbName = "Sport-shop";
 let accountsCollection = null;
@@ -32,7 +32,7 @@ async function addProduct(product) {
 async function editProduct(id, product) {
   const updateResult = await productsCollection.updateOne(
     { id },
-    { $set: product }
+    { $set: product },
   );
   console.log("Updated documents =>", updateResult);
 }
@@ -63,7 +63,7 @@ async function addCart(mail, id) {
       $push: {
         cart: id,
       },
-    }
+    },
   );
 }
 module.exports = {

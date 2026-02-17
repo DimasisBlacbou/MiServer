@@ -1,11 +1,19 @@
-    include includes/head.pug
-p Kорзина
+include includes/head.pug
+include includes/navbar.pug
+
+main.container.py-8
+  h1(class="text-3xl font-semibold mb-6 text-white") Корзина
+if localCart && localCart.length
+  .space-y-4
     each product in localCart
-        li
-            p=product.id
-            h1=product.name
-            p=product.price
-            p=product.inStock
-            p=product.description 
-            h2=product.weight
-            h2=product.flavor
+      .card.p-4.flex.items-center.gap-4
+        if product.image
+          img(src='/' + product.image alt=product.name class='w-24 h-16 object-cover rounded')
+        .flex-1
+          h2(class='text-lg font-semibold text-white')=product.name
+          p(class='text-gray-600 dark:text-gray-400')=product.description
+        .text-right
+          p(class='text-xl font-bold text-white')=product.price + ' ₽' 
+          button(type='button' onclick=`removeFromCart("${product.id}")` class='mt-2 bg-red-600 text-white rounded-md px-3 py-1') Удалить
+else
+  p(class='text-gray-600 dark:text-gray-400') Нет товаров в корзине

@@ -1,14 +1,24 @@
-script(src="catalog.js")
-    include includes/head.pug
-P Добро пожаловать! #{account.name}
-ul
-    each product in products
-        li
-            p=product.id
-            h1=product.name
-            p=product.price
-            p=product.inStock
-            p=product.description 
-            h2=product.weight
-            h2=product.flavor
-            button(onclick=`addToCart("${product.id}")`) Добавить в карзину
+script(src="/catalog.js")
+include includes/head.pug
+include includes/navbar.pug
+
+main.container.py-8(class="text-gray-900 dark:text-white")
+    if account && account.name
+        p(class="mb-4 text-gray-600 dark:text-gray-400") Привет, #{account.name}
+    h1.text-3xl.font-semibold.mb-6(class="text-gray-900 dark:text-white") Каталог
+    div(class="grid grid-cols-1 sm:grid-cols-2 gap-6")
+        each product in products
+            div(class="card flex flex-col md:flex-row items-start gap-4 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg")
+                .img-wrap.flex-shrink-0
+                    if product.image
+                        img(src='/' + product.image alt=product.name width="200" height="200" style="width:200px;height:200px;object-fit:cover;border-radius:8px;" )
+                    else
+                        img(src='/public/data/62a8222ff71a14067552f233de1e43ad' alt=product.name width="200" height="200" style="width:200px;height:200px;object-fit:cover;border-radius:8px;" )
+                .content.flex-1
+                    h2.text-lg.font-semibold.mb-1(class="text-gray-900 dark:text-white")= product.name
+                    p.text-xl.font-bold(class="text-accent")= product.price + ' ₽'
+                    .meta.mt-3
+                        p.text-sm(class="mb-2 text-gray-600 dark:text-gray-400")= product.description
+                        p.text-xs(class="text-gray-600 dark:text-gray-400") В наличии: #{product.inStock}
+                        p.text-xs(class="text-gray-600 dark:text-gray-400")= 'Вес: ' + product.weight + ' • ' + product.flavor
+                        button(type="button" onclick=`addToCart("${product.id}")` class="btn-accent mt-3") Добавить
