@@ -6,14 +6,16 @@ main.container.py-8
 if localCart && localCart.length
   .space-y-4
     each product in localCart
-      .card.p-4.flex.items-center.gap-4
-        if product.image
-          img(src='/' + product.image alt=product.name class='w-24 h-16 object-cover rounded')
-        .flex-1
-          h2(class='text-lg font-semibold text-white')=product.name
-          p(class='text-gray-600 dark:text-gray-400')=product.description
-        .text-right
-          p(class='text-xl font-bold text-white')=product.price + ' ₽' 
-          button(type='button' onclick=`removeFromCart("${product.id}")` class='mt-2 bg-red-600 text-white rounded-md px-3 py-1') Удалить
+      if product
+        .card.p-4.flex.items-center.gap-4
+          if product.image
+            img(src='/' + product.image alt=product.name class='w-24 h-16 object-cover rounded')
+          .flex-1
+            h2(class='text-lg font-semibold text-white')= product.name || 'Без названия' 
+            p(class='text-gray-600 dark:text-gray-400')= product.description || '' 
+          .text-right
+            p(class='text-xl font-bold text-white')= (product.price ? product.price + ' ₽' : '')
+            button(type='button' onclick=`removeFromCart("${product.id}")` class='mt-2 bg-red-600 text-white rounded-md px-3 py-1 cursor-pointer') Удалить
 else
   p(class='text-gray-600 dark:text-gray-400') Нет товаров в корзине
+button(type='button' onclick="orderAcceptedFromCart()" class='mt-6 w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50 disabled:cursor-not-allowed') Заказать

@@ -25,3 +25,43 @@ body {
   background-color: var(--color-background);
   color: var(--color-accent-foreground, #001219);
 }
+
+/* Custom product card hover: show more info and enlarge on hover */
+@layer components {
+  .product-card {
+    transition: transform 200ms ease, box-shadow 200ms ease;
+    overflow: hidden;
+  }
+  .product-card:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 12px 30px rgba(2, 6, 23, 0.12);
+  }
+  .product-img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: transform 200ms ease, width 200ms ease, height 200ms ease;
+  }
+  .product-card:hover .product-img {
+    transform: scale(1.06);
+    width: 240px;
+    height: 240px;
+  }
+  .product-card .meta {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 220ms ease, opacity 180ms ease;
+  }
+  .product-card:hover .meta {
+    max-height: 400px;
+    opacity: 1;
+  }
+  .product-card .short-desc {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 60ch;
+  }
+}

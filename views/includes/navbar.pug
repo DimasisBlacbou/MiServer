@@ -1,14 +1,21 @@
-nav(class="bg-transparent border-b border-gray-700")
-  .container.flex.items-center.justify-between.py-3
+nav(class="bg-transparent border-b border-gray-700 flex items-center w-full")
+  .container.flex.items-center.justify-between.py-3.m-auto 
+    button(id="theme-toggle" type="button" aria-label="Toggle theme" class="text-white px-3 py-2 rounded-md bg-gray-800 hover:bg-gray-700 mr-5") 🌙
     a(href="/" class="flex items-center gap-3")
       span.site-title(class="text-2xl text-white") SportShop
     form(class="flex-1 mx-6")
       input(type="search" placeholder="Поиск товаров..." class="w-full max-w-xl rounded-full border border-gray-700 bg-transparent px-4 py-2 text-white focus:outline-none focus:ring-2" )
     .flex.items-center.gap-3
-      button(id="theme-toggle" type="button" aria-label="Toggle theme" class="text-white px-3 py-2 rounded-md bg-gray-800 hover:bg-gray-700") 🌙
-      a(href="/cart" class="relative text-white")
-        span(style="background:var(--accent); color:#001219; padding:0.35rem 0.6rem; border-radius:9999px") Корзина
+
+
       if account
+        a(href="/cart" class="relative text-white ")
+          span(class="text-white hover:text-gray-500") Корзина
         .flex.items-center.gap-2
-          span(class="text-white hidden sm:inline-block") Привет, #{account.name}
+          span(class="text-white hidden sm:inline-block pl-100") Привет, #{account.name}
           a(href="/clear" class="text-white px-3 py-2 rounded-md bg-red-600 hover:bg-red-500") Выход
+      else 
+        a(href="/register" class="relative text-white ")
+          span(class="text-white hover:text-gray-500") Регистрация 
+        a(href="/login" class="relative text-white ")
+          span(class="text-white hover:text-gray-500") Вход

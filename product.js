@@ -1,11 +1,14 @@
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
+const { sendOrder } = require("./mail.js");
 const {
+  removeCart,
   addCart,
   removeProduct,
   addProduct,
   editProduct,
   getProducts,
+  getAccountByMail,
 } = require("./data.js");
 const multer = require("multer");
 
@@ -29,8 +32,6 @@ const productRouter = (app) => {
     res.status(200).json(products);
   });
   app.post("/products", upload.single("image"), async (req, res) => {
-    console.log(req.file, req.body);
-
     if (req.body.name == undefined) {
       res
         .status(400)
@@ -97,7 +98,6 @@ const productRouter = (app) => {
     res.status(200).json({ result: "ok" });
   });
   app.post("/productsChange", upload.single("image"), async (req, res) => {
-    console.log(req.body);
     if (req.body.id == undefined) {
       res
         .status(400)
@@ -120,7 +120,7 @@ const productRouter = (app) => {
         return;
       }
     }
-    console.log(product);
+
     if (req.body.name != undefined) {
       product.name = req.body.name;
     }
@@ -164,5 +164,44 @@ const productRouter = (app) => {
     await addCart(mail, id);
     res.status(200).json({ result: "ok" });
   });
+  app.delete("/cart", async (req, res) => {
+    const token = req.cookies.token;
+    const decoded = jwt.verify(token, process.env.JWTSECRET);
+    const mail = decoded.mail;
+    const id = req.query.id;
+    await removeCart(mail, id);
+    res.status(200).json({ result: "ok" });
+  });
+  app.post("/order", async (req, res) => {
+    const token = req.cookies.token;
+    const decoded = jwt.verify(token, process.env.JWTSECRET);
+    const mail = decoded.mail;
+    const account = await getAccountByMail(mail);
+    const localCart = account.cart;
+    const products = await getProducts();
+    const orderProducts = localCart.map(
+      (id) => products.filter((product) => product.id == id)[0]
+    );
+    try {
+      const result = await sendOrder(mail);
+      if (!result || result.ok === false) {
+        console.error("sendOrder failed", result && result.error);
+        // respond with ok but include warning so frontend can show message if desired
+        res
+          .status(200)
+          .json({ result: "ok", products: orderProducts, mailSent: false });
+      } else {
+        res
+          .status(200)
+          .json({ result: "ok", products: orderProducts, mailSent: true });
+      }
+    } catch (err) {
+      console.error("Unexpected error when sending order email", err);
+      res
+        .status(500)
+        .json({ result: "error", error: "failed to send order email" });
+    }
+  });
 };
+
 module.exports = { productRouter };

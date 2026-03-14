@@ -3,7 +3,7 @@ const {
   loginAccount,
   checkdDuplicateAccount,
 } = require("./data.js");
-
+const { sendRegisterEmail } = require("./mail.js");
 const jwt = require("jsonwebtoken");
 
 const userRouter = (app) => {
@@ -24,6 +24,7 @@ const userRouter = (app) => {
       res.redirect("/register?error=1");
       return;
     }
+    await sendRegisterEmail(mail);
     await registerAccount(user);
     /*     res.status(200).json("ok"); */
     const token = jwt.sign({ mail: mail }, process.env.JWTSECRET);
@@ -31,6 +32,7 @@ const userRouter = (app) => {
       httpOnly: true,
       maxAge: 3600000 * 24 * 5,
     });
+
     res.redirect("/catalog");
   });
   app.post("/login", async (req, res) => {

@@ -41,5 +41,8 @@ const clientRouter = (app) => {
       res.redirect("/login");
     }
   });
+  app.get("/", async (req, res) => {
+    res.redirect("/catalog");
+  });
 };
 module.exports = { clientRouter };
