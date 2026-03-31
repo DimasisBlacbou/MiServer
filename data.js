@@ -79,6 +79,9 @@ async function removeCart(mail, id) {
     }
   }
 }
+async function clearCart(mail) {
+  await accountsCollection.updateOne({ mail }, { $set: { cart: [] } });
+}
 module.exports = {
   addCart,
   checkdDuplicateAccount,
@@ -90,4 +93,5 @@ module.exports = {
   registerAccount,
   getAccountByMail,
   removeCart,
+  clearCart,
 };

@@ -9,6 +9,7 @@ const {
   editProduct,
   getProducts,
   getAccountByMail,
+  clearCart,
 } = require("./data.js");
 const multer = require("multer");
 
@@ -182,6 +183,7 @@ const productRouter = (app) => {
     const orderProducts = localCart.map(
       (id) => products.filter((product) => product.id == id)[0]
     );
+    await clearCart(mail);
     try {
       const result = await sendOrder(mail);
       if (!result || result.ok === false) {

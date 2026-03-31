@@ -19,3 +19,24 @@ function orderAcceptedFromCart() {
       location.reload();
     });
 }
+function search(e) {
+  const query = e.target.value.toLowerCase().trim();
+  const productCards = document.querySelectorAll(".product-card");
+
+  productCards.forEach((card) => {
+    const productName = card.querySelector("h2").textContent.toLowerCase();
+    const productDescription = card
+      .querySelector(".short-desc")
+      .textContent.toLowerCase();
+
+    if (
+      productName.includes(query) ||
+      productDescription.includes(query) ||
+      query === ""
+    ) {
+      card.style.display = "flex";
+    } else {
+      card.style.display = "none";
+    }
+  });
+}

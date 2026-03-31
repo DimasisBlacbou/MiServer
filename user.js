@@ -1,10 +1,13 @@
 const {
+  getAccountByMail,
   registerAccount,
   loginAccount,
   checkdDuplicateAccount,
 } = require("./data.js");
+const bcrypt = require("bcrypt");
 const { sendRegisterEmail } = require("./mail.js");
 const jwt = require("jsonwebtoken");
+const saltRounds = 10;
 
 const userRouter = (app) => {
   app.post("/register", async (req, res) => {
@@ -12,11 +15,12 @@ const userRouter = (app) => {
     let mail = req.body.mail;
     let year = +req.body.year;
     let password = req.body.password;
+    let hash = await bcrypt.hash(password, saltRounds);
     let user = {
       name,
       mail,
       year,
-      password,
+      password: hash,
       cart: [],
     };
     const rezult = await checkdDuplicateAccount(mail);
@@ -38,11 +42,9 @@ const userRouter = (app) => {
   app.post("/login", async (req, res) => {
     let mail = req.body.mail;
     let password = req.body.password;
-    let user = {
-      mail,
-      password,
-    };
-    const result = await loginAccount(user);
+
+    const account = await getAccountByMail(mail);
+    const result = await bcrypt.compare(password, account.password);
     if (result == true) {
       const token = jwt.sign({ mail: mail }, process.env.JWTSECRET);
       res.cookie("token", token, {

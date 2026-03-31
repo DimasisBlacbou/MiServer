@@ -6,6 +6,15 @@ main.py-8(class="text-gray-900 dark:text-white flex flex-col justify-center item
     if account && account.name
 
     h1.text-3xl.font-semibold.mb-6(class="text-gray-900 dark:text-white") Каталог
+
+    .search-container.w-full.max-w-md.mb-8
+        input(
+            type="text"
+            placeholder="Поиск товаров..."
+            oninput="search(event)"
+            class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-accent"
+        )
+
     div(class="grid grid-cols-1 sm:grid-cols-2 gap-6 ")
         each product in products
             div(class="card product-card flex flex-col md:flex-row items-start gap-4 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg")
