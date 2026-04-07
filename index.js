@@ -1,5 +1,9 @@
 const nodeProcess = require("node:process");
-nodeProcess.loadEnvFile();
+try {
+  nodeProcess.loadEnvFile();
+} catch (e) {
+  console.log(e);
+}
 const express = require("express");
 const { otherRouter } = require("./other");
 const { userRouter } = require("./user");
