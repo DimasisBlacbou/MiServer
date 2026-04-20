@@ -7,6 +7,7 @@ const {
 const bcrypt = require("bcrypt");
 const { sendRegisterEmail } = require("./mail.js");
 const jwt = require("jsonwebtoken");
+const { Admin } = require("mongodb");
 const saltRounds = 10;
 
 const userRouter = (app) => {
@@ -22,6 +23,7 @@ const userRouter = (app) => {
       year,
       password: hash,
       cart: [],
+      admin: false,
     };
     const rezult = await checkdDuplicateAccount(mail);
     if (rezult == true) {
