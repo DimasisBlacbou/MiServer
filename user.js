@@ -46,14 +46,18 @@ const userRouter = (app) => {
     let password = req.body.password;
 
     const account = await getAccountByMail(mail);
-    const result = await bcrypt.compare(password, account.password);
-    if (result == true) {
-      const token = jwt.sign({ mail: mail }, process.env.JWTSECRET);
-      res.cookie("token", token, {
-        httpOnly: true,
-        maxAge: 3600000 * 24 * 5,
-      });
-      res.redirect("/catalog");
+    if (account != undefined) {
+      const result = await bcrypt.compare(password, account.password);
+      if (result == true) {
+        const token = jwt.sign({ mail: mail }, process.env.JWTSECRET);
+        res.cookie("token", token, {
+          httpOnly: true,
+          maxAge: 3600000 * 24 * 5,
+        });
+        res.redirect("/catalog");
+      } else {
+        res.redirect("/login?error=1");
+      }
     } else {
       res.redirect("/login?error=1");
     }

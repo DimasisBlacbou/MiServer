@@ -42,7 +42,7 @@ async function sendRegisterEmail(mail) {
     console.log("Message sent:", info.messageId);
   } catch (err) {
     console.error("Failed to send registration email", err);
-    throw err; // propagate to caller if needed
+    // throw err;
   }
 }
 async function sendOrder(mail) {
