@@ -27,126 +27,145 @@ const upload = multer({ storage: storage });
 
 const { v4: uuidv4 } = require("uuid");
 
+const requireAdmin = (req, res, next) => {
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ result: "error" });
+  try {
+    const decoded = jwt.verify(token, process.env.JWTSECRET);
+    if (!decoded.admin) {
+      return res.status(403).json({ result: "error", error: "Нет доступа" });
+    }
+    req.user = decoded;
+    next();
+  } catch {
+    res.status(401).json({ result: "error" });
+  }
+};
+
 const productRouter = (app) => {
+  // Public — used by the storefront
   app.get("/products", async (req, res) => {
     const products = await getProducts();
     res.status(200).json(products);
   });
-  app.post("/products", upload.single("image"), async (req, res) => {
-    if (req.body.name == undefined) {
-      res
-        .status(400)
-        .json({ result: "error", error: "не правильный ввод 'Name'" });
-      return;
-    }
-    if (req.body.price == undefined) {
-      res
-        .status(400)
-        .json({ result: "error", error: "не правильный ввод 'Prise'" });
-      return;
-    }
-    if (req.body.inStock == undefined) {
-      res
-        .status(400)
-        .json({ result: "error", error: "не правильный ввод 'inStock'" });
-      return;
-    }
-    if (req.body.description == undefined) {
-      res
-        .status(400)
-        .json({ result: "error", error: "не правильный ввод 'Description'" });
-      return;
-    }
-    if (req.file == undefined) {
-      res
-        .status(400)
-        .json({ result: "error", error: "не правильный ввод 'Image'" });
-      return;
-    }
-    if (req.body.weight == undefined) {
-      res
-        .status(400)
-        .json({ result: "error", error: "не правильный ввод 'Weight'" });
-      return;
-    }
-    if (req.body.flavor == undefined) {
-      res
-        .status(400)
-        .json({ result: "error", error: "не правильный ввод 'Flavor'" });
 
-      return;
-    }
-
-    const id = uuidv4();
-    const name = req.body.name;
-    const price = +req.body.price;
-    const inStock = req.body.inStock;
-    const description = req.body.description;
-    const image = "data/" + req.file.filename;
-    const weight = req.body.weight;
-    const flavor = req.body.flavor;
-    const product = {
-      id,
-      name,
-      price,
-      inStock,
-      description,
-      image,
-      weight,
-      flavor,
-    };
-    const _ = await addProduct(product);
-    res.status(200).json({ result: "ok" });
-  });
-  app.post("/productsChange", upload.single("image"), async (req, res) => {
-    if (req.body.id == undefined) {
-      res
-        .status(400)
-        .json({ result: "error", error: "не правильный ввод 'ID'" });
-      return;
-    }
-    const id = req.body.id;
-    const product = {};
-
-    const Check = ["name", "price", "inStock", "weight", "flavor"];
-    for (const field of Check) {
-      if (
-        field in req.body &&
-        (req.body[field] === "" || req.body[field] == null)
-      ) {
-        res.status(400).json({
-          result: "error",
-          error: `Поле '${field}' не должно быть пустым.`,
-        });
+  // Admin only
+  app.post(
+    "/products",
+    requireAdmin,
+    upload.single("image"),
+    async (req, res) => {
+      if (req.body.name == undefined) {
+        res
+          .status(400)
+          .json({ result: "error", error: "не правильный ввод 'Name'" });
         return;
       }
-    }
+      if (req.body.price == undefined) {
+        res
+          .status(400)
+          .json({ result: "error", error: "не правильный ввод 'Prise'" });
+        return;
+      }
+      if (req.body.inStock == undefined) {
+        res
+          .status(400)
+          .json({ result: "error", error: "не правильный ввод 'inStock'" });
+        return;
+      }
+      if (req.body.description == undefined) {
+        res
+          .status(400)
+          .json({ result: "error", error: "не правильный ввод 'Description'" });
+        return;
+      }
+      if (req.file == undefined) {
+        res
+          .status(400)
+          .json({ result: "error", error: "не правильный ввод 'Image'" });
+        return;
+      }
+      if (req.body.weight == undefined) {
+        res
+          .status(400)
+          .json({ result: "error", error: "не правильный ввод 'Weight'" });
+        return;
+      }
+      if (req.body.flavor == undefined) {
+        res
+          .status(400)
+          .json({ result: "error", error: "не правильный ввод 'Flavor'" });
+        return;
+      }
 
-    if (req.body.name != undefined) {
-      product.name = req.body.name;
-    }
-    if (req.body.price != undefined) {
-      product.price = +req.body.price;
-    }
-    if (req.body.inStock != undefined) {
-      product.inStock = req.body.inStock;
-    }
-    if (req.body.description != undefined) {
-      product.description = req.body.description;
-    }
-    if (req.file != undefined) {
-      product.image = "data/" + req.file.filename;
-    }
-    if (req.body.weight != undefined) {
-      product.weight = req.body.weight;
-    }
-    if (req.body.flavor != undefined) {
-      product.flavor = req.body.flavor;
-    }
-    res.status(200).json({ result: "ok" });
-    await editProduct(id, product);
-  });
-  app.delete("/products", async (req, res) => {
+      const id = uuidv4();
+      const name = req.body.name;
+      const price = +req.body.price;
+      const inStock = req.body.inStock;
+      const description = req.body.description;
+      const image = "data/" + req.file.filename;
+      const weight = req.body.weight;
+      const flavor = req.body.flavor;
+      const product = {
+        id,
+        name,
+        price,
+        inStock,
+        description,
+        image,
+        weight,
+        flavor,
+      };
+      const _ = await addProduct(product);
+      res.status(200).json({ result: "ok" });
+    },
+  );
+
+  // Admin only
+  app.post(
+    "/productsChange",
+    requireAdmin,
+    upload.single("image"),
+    async (req, res) => {
+      if (req.body.id == undefined) {
+        res
+          .status(400)
+          .json({ result: "error", error: "не правильный ввод 'ID'" });
+        return;
+      }
+      const id = req.body.id;
+      const product = {};
+
+      const Check = ["name", "price", "inStock", "weight", "flavor"];
+      for (const field of Check) {
+        if (
+          field in req.body &&
+          (req.body[field] === "" || req.body[field] == null)
+        ) {
+          res.status(400).json({
+            result: "error",
+            error: `Поле '${field}' не должно быть пустым.`,
+          });
+          return;
+        }
+      }
+
+      if (req.body.name != undefined) product.name = req.body.name;
+      if (req.body.price != undefined) product.price = +req.body.price;
+      if (req.body.inStock != undefined) product.inStock = req.body.inStock;
+      if (req.body.description != undefined)
+        product.description = req.body.description;
+      if (req.file != undefined) product.image = "data/" + req.file.filename;
+      if (req.body.weight != undefined) product.weight = req.body.weight;
+      if (req.body.flavor != undefined) product.flavor = req.body.flavor;
+
+      res.status(200).json({ result: "ok" });
+      await editProduct(id, product);
+    },
+  );
+
+  // Admin only
+  app.delete("/products", requireAdmin, async (req, res) => {
     if (req.query.id == undefined) {
       res
         .status(400)
@@ -157,6 +176,8 @@ const productRouter = (app) => {
     const _ = await removeProduct(id);
     res.status(200).json({ result: "ok" });
   });
+
+  // Authenticated users
   app.post("/cart", async (req, res) => {
     const token = req.cookies.token;
     const decoded = jwt.verify(token, process.env.JWTSECRET);
@@ -165,6 +186,7 @@ const productRouter = (app) => {
     await addCart(mail, id);
     res.status(200).json({ result: "ok" });
   });
+
   app.delete("/cart", async (req, res) => {
     const token = req.cookies.token;
     const decoded = jwt.verify(token, process.env.JWTSECRET);
@@ -173,6 +195,7 @@ const productRouter = (app) => {
     await removeCart(mail, id);
     res.status(200).json({ result: "ok" });
   });
+
   app.post("/order", async (req, res) => {
     const token = req.cookies.token;
     const decoded = jwt.verify(token, process.env.JWTSECRET);
@@ -181,14 +204,13 @@ const productRouter = (app) => {
     const localCart = account.cart;
     const products = await getProducts();
     const orderProducts = localCart.map(
-      (id) => products.filter((product) => product.id == id)[0]
+      (id) => products.filter((product) => product.id == id)[0],
     );
     await clearCart(mail);
     try {
       const result = await sendOrder(mail);
       if (!result || result.ok === false) {
         console.error("sendOrder failed", result && result.error);
-        // respond with ok but include warning so frontend can show message if desired
         res
           .status(200)
           .json({ result: "ok", products: orderProducts, mailSent: false });

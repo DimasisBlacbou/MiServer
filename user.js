@@ -10,6 +10,14 @@ const jwt = require("jsonwebtoken");
 const { Admin } = require("mongodb");
 const saltRounds = 10;
 
+const respondWith = (res, { status, redirectUrl, json }) => {
+  if (res.req.headers.accept?.includes("application/json")) {
+    res.status(status).json(json);
+  } else {
+    res.redirect(redirectUrl);
+  }
+};
+
 const userRouter = (app) => {
   app.post("/register", async (req, res) => {
     let name = req.body.name;
@@ -32,35 +40,71 @@ const userRouter = (app) => {
     }
     await sendRegisterEmail(mail);
     await registerAccount(user);
-    /*     res.status(200).json("ok"); */
-    const token = jwt.sign({ mail: mail }, process.env.JWTSECRET);
+    // Registered users are never admin, so admin: false in token
+    const token = jwt.sign({ mail: mail, admin: false }, process.env.JWTSECRET);
     res.cookie("token", token, {
       httpOnly: true,
       maxAge: 3600000 * 24 * 5,
     });
-
     res.redirect("/catalog");
   });
+
   app.post("/login", async (req, res) => {
     let mail = req.body.mail;
     let password = req.body.password;
-
     const account = await getAccountByMail(mail);
     if (account != undefined) {
       const result = await bcrypt.compare(password, account.password);
       if (result == true) {
-        const token = jwt.sign({ mail: mail }, process.env.JWTSECRET);
+        // Embed admin flag from the account into the token
+        const token = jwt.sign(
+          { mail: mail, admin: account.admin === true },
+          process.env.JWTSECRET,
+        );
         res.cookie("token", token, {
           httpOnly: true,
           maxAge: 3600000 * 24 * 5,
         });
-        res.redirect("/catalog");
+        respondWith(res, {
+          status: 200,
+          redirectUrl: "/catalog",
+          json: { result: "ok" },
+        });
       } else {
-        res.redirect("/login?error=1");
+        respondWith(res, {
+          status: 401,
+          redirectUrl: "/login?error=1",
+          json: { result: "error", error: "Неправильный пароль или почта" },
+        });
       }
     } else {
-      res.redirect("/login?error=1");
+      respondWith(res, {
+        status: 401,
+        redirectUrl: "/login?error=1",
+        json: { result: "error", error: "Неправильный пароль или почта" },
+      });
     }
   });
+
+  // Only used by the admin React app — rejects non-admins
+  app.get("/auth", (req, res) => {
+    const token = req.cookies.token;
+    if (!token) return res.status(401).json({ result: "error" });
+    try {
+      const decoded = jwt.verify(token, process.env.JWTSECRET);
+      if (!decoded.admin) {
+        return res.status(403).json({ result: "error", error: "Нет доступа" });
+      }
+      res.status(200).json({ result: "ok" });
+    } catch {
+      res.status(401).json({ result: "error" });
+    }
+  });
+
+  app.post("/logout", (req, res) => {
+    res.clearCookie("token");
+    res.status(200).json({ result: "ok" });
+  });
 };
+
 module.exports = { userRouter };
